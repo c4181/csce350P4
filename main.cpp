@@ -7,9 +7,21 @@ using std::endl;
 using std::string;
 using std::vector;
 
+/***************************************************************************
+ * Author: Christopher Moyer
+ * Date: December 8th, 2019
+ *
+ * This program will take in a string from stdin and chop it up into a
+ * palindrone using the least amount of cuts possible. If the string is
+ * already a palindrone, the string will be just be reprinted.
+ *
+**/
+
+
 bool isPalindrone(string word, int i, int k) {
     if (k > 1) {
-        return word.at(i) == word.at(i + k - 1) && isPalindrone(word, i + 1, k - 2);
+        return word.at(i) == word.at(i + k - 1)
+               && isPalindrone(word, i + 1, k - 2);
     } else {
         return true;
     }
@@ -20,20 +32,18 @@ int main() {
 
     // Read from stdin until EOF
     while (cin >> input) {
+        // Check if each possible substring of the string is a palindrone
+        // and store the result in a vector
         size_t substring_length = input.size();
-        vector<vector<bool>> substringIsPalindrone(input.size(), vector<bool>(input.size() + 1));
+        // 1st Dimension is starting index of the substring
+        // 2nd Dimension is the length of the substring
+        vector<vector<bool>> substringIsPalindrone(input.size(),
+                                       vector<bool>(input.size() + 1));
         for (size_t i = 0; i < input.size(); ++i) {
             for (size_t j = 1; j <= substring_length; ++j) {
-                string substring = input.substr(i, j );
-                //cout << "Checking if " << substring << " is a palindrone" << endl;
+                string substring = input.substr(i, j);
                 bool result = isPalindrone(substring, 0, substring.size());
                 substringIsPalindrone.at(i).at(j) = result;
-                /*
-                if (result == true) {
-                    cout << i << " to " << j << " is a palindrone" << endl;
-                } else {
-                    cout << i << " to " << j << " is not a palindrone" << endl;
-                }*/
             }
             --substring_length;
         }
@@ -43,41 +53,33 @@ int main() {
         int number_of_cuts = 0;
         int i = 0;
         int j = 0;
+
+        // Find the smallest number of cuts to make the string a palindrone.
+        // This loop the subtring at index 0, and finds the longest possible
+        // palindrone starting at that index. The function moves the index
+        // after the previous cut and continues looking for the largest
+        // possible palindrone all cuts have been completed
         while (test != input) {
             i = substringIsPalindrone.at(j).size() - 1;
             if (j == 0) {
-                while(substringIsPalindrone.at(j).at(i) != true) {
-                    //cout << "i is " << i << endl;
+                while (substringIsPalindrone.at(j).at(i) != true) {
                     --i;
                 }
                 string_cuts = input.substr(j, i);
                 test += input.substr(j, i);
                 j = i;
-                //cout << "String cut to " << string_cuts << endl;
             } else {
-                while(substringIsPalindrone.at(j).at(i) != true) {
-                    //cout << "i is " << i << endl;
-                    //cout << "j is " << j << endl;
-                    //cout << "j at i is " << substringIsPalindrone.at(j).at(i) << endl;
+                while (substringIsPalindrone.at(j).at(i) != true) {
                     --i;
                 }
                 string_cuts += "|";
                 string_cuts += input.substr(j, i);
                 test += input.substr(j, i);
-                //cout << i << " + 1 is" << i + 1 << endl; 
                 j = j + i;
                 ++number_of_cuts;
-                //cout << "String cut to " << string_cuts << endl;
             }
         }
 
         cout << number_of_cuts << " " << string_cuts << endl;
-
-        /*
-        for (size_t i = substringIsPalindrone.size() - 1; i >= 0; --i) {
-            for (size_t j = substringIsPalindrone.at(i).size(); j >= 0; --j) {
-
-            }
-        }*/
     }
 }
